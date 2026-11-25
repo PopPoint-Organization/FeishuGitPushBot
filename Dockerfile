@@ -25,6 +25,9 @@ RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
 # --- 阶段 3: 运行阶段 ---
 FROM cgr.dev/chainguard/static:latest
 
+# AWS Lambda Web Adapter（仅在 AWS Lambda 环境激活，普通容器运行时无影响）
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.9.1 /lambda-adapter /opt/extensions/lambda-adapter
+
 # 设置时区环境变量 (Go 运行时会自动识别)
 ENV TZ=Asia/Shanghai
 
