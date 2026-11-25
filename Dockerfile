@@ -1,11 +1,13 @@
 # --- 阶段 1: 下载依赖 ---
-FROM golang:alpine AS deps
+FROM --platform=$BUILDPLATFORM golang:alpine AS deps
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
 # --- 阶段 2: 编译阶段 ---
-FROM golang:alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:alpine AS builder
+ARG TARGETOS=linux
+ARG TARGETARCH=amd64
 WORKDIR /app
 
 # 1. 安装 tzdata 并手动创建 timezone 文件
@@ -15,7 +17,7 @@ RUN apk add --no-cache tzdata && \
 COPY --from=deps /go/pkg /go/pkg
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build \
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
     -ldflags="-s -w" \
     -trimpath \
     -o /app/main .
