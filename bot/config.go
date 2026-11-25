@@ -13,9 +13,10 @@ import (
 // Config 结构体定义了所有配置项
 type Config struct {
 	Feishu struct {
-		AppID     string `koanf:"app_id"`
-		AppSecret string `koanf:"app_secret"`
-		ChatID    string `koanf:"chat_id"`
+		AppID       string `koanf:"app_id"`
+		AppSecret   string `koanf:"app_secret"`
+		ChatID      string `koanf:"chat_id"`
+		OpenBaseURL string `koanf:"open_base_url"`
 	} `koanf:"feishu"`
 	Github struct {
 		Key      string `koanf:"github_key"`
@@ -95,6 +96,7 @@ func LoadConfig() {
 	if C.Events.ThreadReplyWindow == 0 {
 		C.Events.ThreadReplyWindow = 60 // 默认 60 分钟
 	}
+	slog.Info("Lark Open API base URL", "base_url", resolveLarkOpenBaseURL(C.Feishu.OpenBaseURL))
 	slog.Info("Event merge window", "minutes", C.Events.MergeWindow)
 	slog.Info("Thread reply window", "minutes", C.Events.ThreadReplyWindow)
 	if C.Security.AllowedIPs != "" {

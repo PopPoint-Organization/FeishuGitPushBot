@@ -19,8 +19,12 @@ func main() {
 	slog.Info("System starting...")
 
 	// 启动路由
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 	r := bot.InitRouter()
-	if err := r.Run(":8080"); err != nil {
+	if err := r.Run(":" + port); err != nil {
 		slog.Error("Service failed", "error", err)
 		os.Exit(1)
 	}

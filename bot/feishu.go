@@ -27,10 +27,27 @@ var (
 	larkOnce   sync.Once
 )
 
-// GetLarkClient 获取飞书 SDK 客户端单例
+// resolveLarkOpenBaseURL 解析开放平台域名：默认飞书国内版，支持 "lark" 或完整 URL（如 https://open.larksuite.com）
+func resolveLarkOpenBaseURL(raw string) string {
+	trimmed := strings.TrimRight(strings.TrimSpace(raw), "/")
+	switch strings.ToLower(trimmed) {
+	case "", "feishu":
+		return lark.FeishuBaseUrl
+	case "lark":
+		return lark.LarkBaseUrl
+	default:
+		return trimmed
+	}
+}
+
+// GetLarkClient 获取飞书/Lark SDK 客户端单例
 func GetLarkClient() *lark.Client {
 	larkOnce.Do(func() {
-		larkClient = lark.NewClient(C.Feishu.AppID, C.Feishu.AppSecret)
+		larkClient = lark.NewClient(
+			C.Feishu.AppID,
+			C.Feishu.AppSecret,
+			lark.WithOpenBaseUrl(resolveLarkOpenBaseURL(C.Feishu.OpenBaseURL)),
+		)
 	})
 	return larkClient
 }

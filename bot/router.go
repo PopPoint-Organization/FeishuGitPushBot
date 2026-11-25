@@ -24,6 +24,11 @@ func InitRouter() *gin.Engine {
 	// 基础中间件
 	r.Use(cors.Default())
 
+	// 健康检查（不受 GitHub Webhook IP 白名单限制）
+	r.GET("/healthz", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
+
 	// Webhook 路由（带 IP 白名单校验）
 	r.POST("/github/webhook", ipWhitelistMiddleware(), GithubHandler)
 
