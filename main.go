@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"os"
 
@@ -14,6 +15,7 @@ func main() {
 
 	// 加载配置
 	bot.LoadConfig()
+	bot.InitPRThreadService(context.Background())
 	bot.InitDB()
 	bot.StartWorker()
 	slog.Info("System starting...")

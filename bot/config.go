@@ -25,6 +25,9 @@ type Config struct {
 	Database struct {
 		URL string `koanf:"url"`
 	} `koanf:"database"`
+	DynamoDB struct {
+		Table string `koanf:"table"`
+	} `koanf:"dynamodb"`
 	Events struct {
 		MergeWindow       int `koanf:"merge_window"`        // 同类事件合并窗口（分钟），默认 15
 		ThreadReplyWindow int `koanf:"thread_reply_window"` // 话题回复窗口（分钟），超过此时间的父消息不再以话题回复，默认 60
@@ -59,6 +62,9 @@ func LoadConfig() {
 		}
 		if s == "database_url" {
 			return "database.url"
+		}
+		if s == "dynamodb_table" {
+			return "dynamodb.table"
 		}
 		if s == "events_merge_window" {
 			return "events.merge_window"

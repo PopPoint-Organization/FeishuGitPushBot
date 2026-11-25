@@ -35,6 +35,25 @@ func GithubHandler(c *gin.Context) {
 		return
 	}
 
+	// 一 PR 一话题聚合模式（DynamoDB，同步执行适配 Serverless / Lambda）
+	if PRThreadSvc != nil {
+		status, err := PRThreadSvc.HandleWebhook(c.Request.Context(), deliveryID, eventType, payload)
+		if err != nil {
+			slog.Error("PR thread handler failed",
+				"delivery_id", deliveryID,
+				"event_type", eventType,
+				"error", err)
+			c.AbortWithStatusJSON(500, gin.H{"code": 3, "msg": "failed to handle PR thread event"})
+			return
+		}
+		slog.Info("PR thread event handled",
+			"delivery_id", deliveryID,
+			"event_type", eventType,
+			"result", status)
+		c.JSON(200, gin.H{"code": 0, "msg": status})
+		return
+	}
+
 	// 幂等性检查：如果 deliveryID 已存在，直接返回成功
 	if DB != nil && deliveryID != "" {
 		exists, err := DB.NewSelect().
